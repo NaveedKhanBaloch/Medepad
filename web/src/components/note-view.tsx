@@ -5,6 +5,14 @@ import type { NoteResult } from "@/lib/types";
 
 const RTL = ["ar", "ur", "fa"];
 
+/** The notes as plain text (for Copy): summary, then each heading with its text, then the codes. */
+export function noteText(note: NoteResult): string {
+  const parts = [note.summary.replace(/^\[Mock output[^\]]*\]\s*/, "")];
+  for (const s of note.sections) parts.push(`${s.title}\n${s.content}`);
+  if (note.diagnostic_codes.length) parts.push(note.diagnostic_codes.map((d) => `${d.code} ${d.description}`).join("\n"));
+  return parts.filter(Boolean).join("\n\n");
+}
+
 export function NoteView({ note, language }: { note: NoteResult; language?: string }) {
   return (
     <div data-testid="note-view" dir={language && RTL.includes(language) ? "rtl" : undefined} lang={language}>

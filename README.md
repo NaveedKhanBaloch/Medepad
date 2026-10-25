@@ -10,12 +10,20 @@ database and gives admins a web view to **create, edit, version, test and choose
 | Part | Status |
 |---|---|
 | Admin login (email + password, several admins, no Google) | ✅ Done |
+| Roles: one **super admin** (manages admins) and normal admins | ✅ Done |
 | Dashboard | ✅ Done |
-| Templates & prompts: create, edit, versions (v1, v2…), choose the one in use | ✅ Done |
-| Test a prompt: transcript → notes (Google Gemini) | ✅ Done |
-| Results history (exact prompt + transcript + notes of every run) | ✅ Done |
-| Settings (version in use per template, AI in use, change password) and Admins | ✅ Done |
+| Templates: create, edit details and note headings, show/hide, delete | ✅ Done |
+| Prompts: edit, versions (v1, v2… each with its own colour), choose the one in use | ✅ Done |
+| Test a prompt: transcript → notes (Google Gemini), full screen, copy, Word download | ✅ Done |
+| Results history (exact prompt + transcript + notes), delete, download all as ZIP | ✅ Done |
+| Settings (version in use per template, change password) and Admins | ✅ Done |
 | Clinical app reads its prompts from here, and comparing results | ⏳ Next |
+
+### Roles
+- **Super admin** – the account whose email is `SUPER_ADMIN_EMAIL` in `backend/.env` (only one). Sees the **Admins**
+  page: adds admins, switches them off/on and sets their passwords. Cannot be switched off.
+- **Admin** – everyone the super admin adds. Dashboard, Templates, Prompts, Results and Settings; no Admins page
+  (also refused by the server). Everyone changes their own password in **Settings** (current + new password).
 
 ---
 
@@ -70,13 +78,16 @@ backend/tests/                 automatic tests (run offline)
 |---|---|---|
 | POST | `/auth/login` | Sign in (email + password) → token |
 | GET | `/auth/me` · POST `/auth/change-password` | Who is signed in · change own password |
-| GET / POST | `/admins` · PATCH `/admins/{id}` | List / add admins · rename, switch off/on, set a new password |
+| GET / POST | `/admins` · PATCH `/admins/{id}` | **Super admin only:** list / add admins · rename, switch off/on, set a new password |
 | GET / POST | `/templates` | List (add `?with_versions=true` for each template's versions) / create a template with its first prompt |
 | GET / PATCH / DELETE | `/templates/{id}` | One template with all its prompt versions / edit details / delete |
 | GET / POST | `/templates/{id}/prompts` | Versions / save the editor text as a new version (`activate: true` also puts it in use) |
 | PUT | `/templates/{id}/active-prompt` | Choose which version is in use |
 | POST | `/generate` | Prompt (saved version or unsaved text) + transcript → notes |
 | GET | `/generations` · `/generations/{id}` | Results history |
+| GET | `/generations/{id}/download` | The notes of one result as a Word file |
+| GET | `/generations/export?template_id=` | All results (or one template's) as a ZIP of Word files: notes, transcript, prompt |
+| DELETE | `/generations/{id}` | Delete one result |
 | GET | `/dashboard` · `/settings/ai` | Dashboard numbers · AI in use and the 20 note languages |
 
 ### Security

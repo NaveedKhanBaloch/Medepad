@@ -19,6 +19,11 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+# Roles: the one super admin manages admins; admins work on templates, prompts, testing and settings.
+ROLE_SUPER = "super_admin"
+ROLE_ADMIN = "admin"
+
+
 class Admin(Base):
     __tablename__ = "admins"
 
@@ -26,12 +31,17 @@ class Admin(Base):
     name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
+    role: Mapped[str] = mapped_column(String(20), default=ROLE_ADMIN)  # super_admin | admin
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     failed_logins: Mapped[int] = mapped_column(Integer, default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_by_id: Mapped[int | None] = mapped_column(ForeignKey("admins.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    @property
+    def is_super_admin(self) -> bool:
+        return self.role == ROLE_SUPER
 
 
 class Template(Base):

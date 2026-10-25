@@ -2,7 +2,7 @@
 
 // Sidebar + top bar around every signed-in page (same look as the Medepad clinical app).
 import clsx from "clsx";
-import { ChevronDown, FileStack, History, LayoutGrid, LogOut, Menu, Moon, Settings, Sun, Users, X } from "lucide-react";
+import { ChevronDown, FileStack, History, LayoutGrid, LogOut, Menu, Moon, Settings, Sparkles, Sun, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,8 @@ const NAV = [
     label: "Workspace",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-      { href: "/templates", label: "Templates & prompts", icon: FileStack },
+      { href: "/templates", label: "Templates", icon: FileStack },
+      { href: "/prompts", label: "Prompts", icon: Sparkles },
       { href: "/results", label: "Results", icon: History },
     ],
   },
@@ -24,10 +25,10 @@ const NAV = [
     label: "Administration",
     items: [
       { href: "/settings", label: "Settings", icon: Settings },
-      { href: "/admins", label: "Admins", icon: Users },
+      { href: "/admins", label: "Admins", icon: Users, superOnly: true },
     ],
   },
-];
+] as { label: string; items: { href: string; label: string; icon: React.ElementType; superOnly?: boolean }[] }[];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const { admin, loading, offline, logout } = useAuth();
@@ -79,7 +80,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <div key={group.label}>
               <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{group.label}</p>
               <div className="flex flex-col gap-0.5">
-                {group.items.map(({ href, label, icon: Icon }) => {
+                {group.items.filter((item) => !item.superOnly || admin?.role === "super_admin").map(({ href, label, icon: Icon }) => {
                   const active = pathname === href || pathname.startsWith(`${href}/`);
                   return (
                     <Link
@@ -109,40 +110,53 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {navOpen && <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setNavOpen(false)} />}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-20 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur sm:px-8">
+        <header className="sticky top-0 z-20 flex h-20 items-center gap-3 border-b border-line bg-surface/90 ps-4 pe-3 backdrop-blur sm:ps-8 sm:pe-4">
           <button className="lg:hidden" onClick={() => setNavOpen(true)} aria-label="Open menu">
             <Menu className="size-6 text-ink" />
           </button>
           <h1 className="min-w-0 flex-1 truncate font-display text-[1.6rem] font-extrabold tracking-tight text-brand lg:text-[2rem]">
             Medepad <span className="text-accent">Admin</span>
           </h1>
-          <button
-            type="button"
-            onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
-            className="grid size-10 place-items-center rounded-xl border border-line bg-surface text-ink transition hover:border-brand/50"
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            title={theme === "dark" ? "Light mode" : "Dark mode"}
-          >
-            {theme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
-          </button>
-          <div className="relative" ref={menuRef}>
+          <div className="relative flex items-center gap-1.5" ref={menuRef}>
+            {/* profile name, avatar circle, then the light/dark button at the very end */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="hidden max-w-[11rem] truncate rounded-lg px-1.5 py-1 text-sm font-semibold text-ink hover:bg-surface-2 sm:block"
+              tabIndex={-1}
+              aria-hidden
+            >
+              {name}
+            </button>
             <button
               onClick={() => setMenuOpen((o) => !o)}
               aria-haspopup="menu"
               aria-expanded={menuOpen}
-              className="flex items-center gap-2.5 rounded-full py-1 pe-1.5 ps-3 transition hover:bg-surface-2"
+              aria-label={`${name} (${admin?.email ?? ""})`}
+              className="flex items-center gap-1 rounded-full p-0.5 pe-1 transition hover:bg-surface-2"
             >
-              <span className="hidden max-w-[12rem] truncate font-semibold text-ink sm:block">{name}</span>
-              <span className="grid size-9 place-items-center rounded-full bg-brand text-[15px] font-semibold text-white ring-2 ring-surface shadow-sm">
+              <span className="grid size-8 place-items-center rounded-full bg-brand text-[13px] font-semibold text-white ring-2 ring-surface shadow-sm">
                 {initial}
               </span>
-              <ChevronDown className={clsx("size-4 text-muted transition-transform", menuOpen && "rotate-180")} />
+              <ChevronDown className={clsx("size-3.5 text-muted transition-transform", menuOpen && "rotate-180")} />
+            </button>
+            <button
+              type="button"
+              onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
+              className="grid size-8 place-items-center rounded-lg border border-line bg-surface text-ink transition hover:border-brand/50"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+            >
+              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
             {menuOpen && (
-              <div className="absolute end-0 z-30 mt-1.5 w-60 rounded-xl border border-line bg-surface p-1 shadow-xl" role="menu">
+              <div className="absolute end-0 top-full z-30 mt-1.5 w-60 rounded-xl border border-line bg-surface p-1 shadow-xl" role="menu">
                 <div className="mb-1 border-b border-line px-2.5 pb-2 pt-1.5">
                   <div className="truncate text-sm font-semibold text-ink">{name}</div>
                   <div className="truncate text-xs text-muted">{admin?.email}</div>
+                  <span className="mt-1.5 inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand">
+                    {admin?.role === "super_admin" ? "Super admin" : "Admin"}
+                  </span>
                 </div>
                 <Link href="/settings#password" className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm hover:bg-surface-2" onClick={() => setMenuOpen(false)}>
                   <Settings className="size-4" /> Settings & password

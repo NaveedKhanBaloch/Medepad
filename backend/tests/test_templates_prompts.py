@@ -71,9 +71,27 @@ def test_generate_notes_from_saved_version_and_from_unsaved_text(client, h):
     assert draft["prompt_id"] is None and draft["prompt_text"] == "My new draft prompt." and draft["language"] == "sv"
     assert [s["title"] for s in draft["result"]["sections"]] == ["Summary", "Plan"]
 
+    word = client.get(f"/api/v1/generations/{draft['id']}/download", headers=h)
+    assert word.status_code == 200 and word.content[:2] == b"PK" and ".docx" in word.headers["content-disposition"]
+    assert client.get(f"/api/v1/generations/{draft['id']}/download").status_code == 401
+
+    # all results of this template as a ZIP of Word files with notes, transcript and prompt
+    import io
+    import zipfile
+
+    z = client.get(f"/api/v1/generations/export?template_id={soap['id']}", headers=h)
+    assert z.status_code == 200 and z.headers["content-type"] == "application/zip"
+    names = zipfile.ZipFile(io.BytesIO(z.content)).namelist()
+    assert len(names) >= 3 and all(n.endswith(".docx") for n in names) and len(set(names)) == len(names)
+    xml = zipfile.ZipFile(io.BytesIO(zipfile.ZipFile(io.BytesIO(z.content)).read(names[0]))).read("word/document.xml").decode()
+    assert "Transcript" in xml and "Prompt used" in xml
+
     history = client.get(f"/api/v1/generations?template_id={soap['id']}", headers=h).json()
     assert len(history) >= 3 and history[0]["id"] == draft["id"]
     assert client.get(f"/api/v1/generations/{draft['id']}", headers=h).json()["transcript"] == TRANSCRIPT
+    # delete one result
+    assert client.delete(f"/api/v1/generations/{draft['id']}", headers=h).status_code == 204
+    assert client.get(f"/api/v1/generations/{draft['id']}", headers=h).status_code == 404
 
 
 def test_generate_without_a_template_and_validation(client, h):

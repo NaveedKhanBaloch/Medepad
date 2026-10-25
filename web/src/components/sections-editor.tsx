@@ -2,13 +2,24 @@
 
 // Ordered list of note headings (e.g. Current, Findings, Assessment, Plan, Referral): add, rename, move, remove.
 import { ArrowDown, ArrowUp, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export function SectionsEditor({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const [draft, setDraft] = useState("");
+  const [hint, setHint] = useState<string | null>(null);
+  const input = useRef<HTMLInputElement>(null);
   const add = () => {
     const name = draft.trim();
-    if (!name || value.some((v) => v.toLowerCase() === name.toLowerCase())) return;
+    if (!name) {
+      setHint("Type a heading in the box first, then press Add.");
+      input.current?.focus();
+      return;
+    }
+    if (value.some((v) => v.toLowerCase() === name.toLowerCase())) {
+      setHint(`“${name}” is already in the list.`);
+      return;
+    }
+    setHint(null);
     onChange([...value, name]);
     setDraft("");
   };
@@ -43,8 +54,12 @@ export function SectionsEditor({ value, onChange }: { value: string[]; onChange:
       </ol>
       <div className="mt-2 flex gap-2">
         <input
+          ref={input}
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setHint(null);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -55,10 +70,15 @@ export function SectionsEditor({ value, onChange }: { value: string[]; onChange:
           aria-label="New heading"
           className="h-9 min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 text-sm text-ink caret-ink outline-none focus:border-brand"
         />
-        <button type="button" onClick={add} className="inline-flex h-9 items-center gap-1 rounded-xl border border-brand/40 px-3 text-sm font-semibold text-brand hover:bg-brand-soft">
+        <button type="button" onClick={add} data-testid="add-heading" className="inline-flex h-9 items-center gap-1 rounded-xl border border-brand/40 px-3 text-sm font-semibold text-brand hover:bg-brand-soft">
           <Plus className="size-4" /> Add
         </button>
       </div>
+      {hint && (
+        <p className="mt-1.5 text-xs font-medium text-warning" role="status" data-testid="heading-hint">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

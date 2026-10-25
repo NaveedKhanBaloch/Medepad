@@ -2,13 +2,15 @@
 
 // Test a prompt: paste a transcript, choose the notes language, press Generate and read the notes.
 // The prompt sent is exactly what is in the editor (saved version or unsaved draft).
-import { FlaskConical, Sparkles, Wand2 } from "lucide-react";
+import { FlaskConical, Maximize2, Sparkles, Wand2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { SAMPLE_TRANSCRIPT } from "@/lib/samples";
+import { versionSoft } from "@/lib/version-colors";
 import type { Generation, Language } from "@/lib/types";
 import { buttonClass, TextArea } from "./fields";
 import { NoteView } from "./note-view";
+import { NoteActions, NotesModal } from "./notes-modal";
 import { ErrorBanner, Select, Spinner } from "./ui";
 
 let languagesCache: Language[] | null = null;
@@ -52,6 +54,7 @@ export function TestPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Generation | null>(null);
+  const [fullScreen, setFullScreen] = useState(false);
 
   const generate = async () => {
     setBusy(true);
@@ -67,6 +70,7 @@ export function TestPanel({
         language,
       });
       setResult(g);
+      setFullScreen(true); // new notes open in full screen
       onGenerated?.(g);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -81,7 +85,7 @@ export function TestPanel({
         <FlaskConical className="size-5 text-brand" /> Test the prompt
       </h3>
       <p className="mt-0.5 text-sm text-ink-2">
-        Uses the text in the editor{isDraft ? " (unsaved draft)" : ""}. Use sample or role-play conversations only.
+        Uses the text in the editor{isDraft ? " (unsaved draft)" : ""}.
       </p>
       <TextArea
         className="mt-3"
@@ -102,6 +106,8 @@ export function TestPanel({
           options={languages.map((l) => ({ value: l.code, label: l.name }))}
           ariaLabel="Notes language"
           className="ms-auto w-48"
+          matchWidth
+          dropUp
         />
         <button
           type="button"
@@ -121,16 +127,24 @@ export function TestPanel({
       {result?.result && (
         <div className="mt-4 border-t border-line pt-4" data-testid="test-result">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-semibold text-brand">
+            <span className={`rounded-full px-2.5 py-0.5 font-semibold ${result.prompt_version ? versionSoft(result.prompt_version) : "bg-warning/15 text-warning"}`}>
               {result.prompt_version ? `Version ${result.prompt_version}` : "Unsaved draft"}
             </span>
-            <span className="text-muted">
-              {result.model} · {(result.latency_ms / 1000).toFixed(1)} s
+            <span className="ms-auto flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setFullScreen(true)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-brand/40 bg-surface px-3 text-sm font-semibold text-brand hover:bg-brand-soft"
+              >
+                <Maximize2 className="size-4" /> Full screen
+              </button>
+              <NoteActions generation={result} />
             </span>
           </div>
           <NoteView note={result.result} language={result.language} />
         </div>
       )}
+      {fullScreen && result?.result && <NotesModal generation={result} onClose={() => setFullScreen(false)} />}
     </section>
   );
 }

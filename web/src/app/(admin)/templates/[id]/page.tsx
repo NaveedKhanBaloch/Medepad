@@ -1,19 +1,20 @@
 "use client";
 
-// One template: its prompt versions (v1, v2 ... one "in use"), the prompt editor, the note headings,
-// template details, and the test panel (transcript -> notes) next to the editor.
+// One template: its details (name, group, description, options), shown/hidden, its note headings, and a summary of
+// its prompt versions. The prompt itself is edited and tested on the Prompts page.
 import clsx from "clsx";
-import { ArrowLeft, Check, CheckCircle2, Eye, EyeOff, ListOrdered, Pencil, Save, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Eye, EyeOff, ListOrdered, Pencil, Save, Sparkles, Star, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { buttonClass, Field, TextArea, Toggle } from "@/components/fields";
 import { Modal } from "@/components/modal";
 import { SectionsEditor } from "@/components/sections-editor";
-import { TestPanel } from "@/components/test-panel";
+import { useToast } from "@/components/toast";
 import { ErrorBanner, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
 import { timeAgo } from "@/lib/auth";
+import { versionSoft, versionSolid } from "@/lib/version-colors";
 import type { Template } from "@/lib/types";
 
 export default function TemplatePage() {
@@ -21,26 +22,25 @@ export default function TemplatePage() {
   const router = useRouter();
   const [t, setT] = useState<Template | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [text, setText] = useState("");
-  const [note, setNote] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [sections, setSections] = useState<string[]>([]);
   const [editingDetails, setEditingDetails] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const toast = useToast();
 
-  const show = useCallback((data: Template, promptId?: number | null) => {
+  const show = (data: Template) => {
     setT(data);
     setSections(data.sections);
-    const pick = data.prompts.find((p) => p.id === promptId) ?? data.prompts.find((p) => p.id === data.active_prompt_id) ?? data.prompts[0];
-    setSelectedId(pick?.id ?? null);
-    setText(pick?.content ?? "");
-  }, []);
+  };
 
   useEffect(() => {
-    api.template(id).then((d) => show(d)).catch((e) => setError(e.message));
-  }, [id, show]);
+    api
+      .template(id)
+      .then((data) => {
+        setT(data);
+        setSections(data.sections);
+      })
+      .catch((e) => setError(e.message));
+  }, [id]);
 
   if (error && !t) return <ErrorBanner message={error} />;
   if (!t)
@@ -50,45 +50,34 @@ export default function TemplatePage() {
       </div>
     );
 
-  const selected = t.prompts.find((p) => p.id === selectedId) ?? null;
-  const changed = !selected || text.trim() !== selected.content.trim();
   const sectionsChanged = JSON.stringify(sections) !== JSON.stringify(t.sections);
 
-  const flash = (m: string) => {
-    setMessage(m);
-    setTimeout(() => setMessage(null), 3500);
-  };
-
-  const save = async (activate: boolean) => {
-    setSaving(true);
+  const saveSections = async (list: string[] = sections, message = "Note headings saved") => {
     setError(null);
     try {
-      const p = await api.savePrompt(t.id, text, note, activate);
-      setNote("");
-      show(await api.template(t.id), p.id);
-      flash(activate ? `Saved as version ${p.version} and put in use.` : `Saved as version ${p.version}.`);
+      show(await api.updateTemplate(t.id, { sections: list }));
+      toast.show(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setSaving(false);
+      setSections(t.sections);
     }
   };
 
-  const activateVersion = async (promptId: number) => {
-    setError(null);
-    try {
-      show(await api.setActivePrompt(t.id, promptId), promptId);
-      flash("This version is now in use.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
+  /** Adding, removing or moving a heading saves at once; renaming one waits for "Save headings". */
+  const changeSections = (next: string[]) => {
+    setSections(next);
+    const sameItems = [...next].sort().join("\n") === [...sections].sort().join("\n");
+    if (next.length > sections.length) void saveSections(next, "Heading added");
+    else if (next.length < sections.length) void saveSections(next, "Heading removed");
+    else if (sameItems && next.join("\n") !== sections.join("\n")) void saveSections(next, "Order saved");
   };
 
-  const saveSections = async () => {
+  const chooseVersion = async (promptId: number, version: number) => {
+    if (promptId === t.active_prompt_id) return;
     setError(null);
     try {
-      show(await api.updateTemplate(t.id, { sections }), selectedId);
-      flash("Note headings saved.");
+      show(await api.setActivePrompt(t.id, promptId));
+      toast.show(`Version ${version} is now in use`);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -96,14 +85,16 @@ export default function TemplatePage() {
 
   const toggleActive = async () => {
     try {
-      show(await api.updateTemplate(t.id, { is_active: !t.is_active }), selectedId);
+      const updated = await api.updateTemplate(t.id, { is_active: !t.is_active });
+      show(updated);
+      toast.show(updated.is_active ? "Template shown to the clinical app" : "Template hidden from the clinical app");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
   };
 
   return (
-    <div className="space-y-4" data-testid="template-page">
+    <div className="space-y-4" data-testid="template-details-page">
       <Link href="/templates" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
         <ArrowLeft className="size-4" /> Templates
       </Link>
@@ -117,13 +108,17 @@ export default function TemplatePage() {
           <p className="mt-0.5 text-sm text-ink-2">{t.description || "No description"}</p>
           <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
             <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-semibold text-ink-2">{t.group_name || "Other"}</span>
-            <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-semibold text-brand">
-              {t.active_version ? `Version ${t.active_version} in use` : "No version in use"}
+            <span className={clsx("rounded-full px-2.5 py-0.5 font-semibold", t.active_version ? versionSoft(t.active_version) : "bg-danger-soft text-danger")}>
+              {t.active_version ? `Prompt version ${t.active_version} in use` : "No prompt in use"}
             </span>
             <span className={clsx("rounded-full px-2.5 py-0.5 font-semibold", t.is_active ? "bg-success-soft text-success" : "bg-surface-2 text-muted")}>
               {t.is_active ? "Offered to the clinical app" : "Hidden from the clinical app"}
             </span>
-            {t.include_codes && <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-semibold text-ink-2">ICD-10 codes</span>}
+            {t.include_codes && (
+              <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-semibold text-ink-2" title="The notes include ICD-10 diagnosis codes, e.g. J06.9">
+                Adds ICD-10 diagnosis codes
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -140,111 +135,71 @@ export default function TemplatePage() {
       </section>
 
       {error && <ErrorBanner message={error} />}
-      {message && (
-        <p className="flex items-center gap-2 rounded-xl border border-success/30 bg-success-soft px-4 py-2.5 text-sm font-semibold text-success" role="status" data-testid="flash">
-          <CheckCircle2 className="size-4" /> {message}
-        </p>
-      )}
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <div className="space-y-4">
-          <section className="card p-5" data-testid="prompt-editor">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-display text-lg font-bold text-ink">Prompt</h3>
-              <span className={clsx("text-xs font-semibold", changed ? "text-warning" : "text-muted")} data-testid="editor-state">
-                {changed ? "Unsaved changes" : selected ? `Showing version ${selected.version}` : ""}
-              </span>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-1.5" role="tablist" aria-label="Versions">
-              {t.prompts.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={p.id === selectedId}
-                  onClick={() => {
-                    setSelectedId(p.id);
-                    setText(p.content);
-                  }}
-                  data-testid="version-chip"
-                  className={clsx(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition",
-                    p.id === selectedId ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink-2 hover:border-brand/40",
-                  )}
-                >
-                  v{p.version}
-                  {p.id === t.active_prompt_id && <Check className="size-3.5" aria-label="in use" />}
-                </button>
-              ))}
-            </div>
-            {selected && (
-              <p className="mt-2 text-xs text-muted">
-                Version {selected.version} · {selected.created_by_name ?? "starter"} · {timeAgo(selected.created_at)}
-                {selected.change_note ? ` · “${selected.change_note}”` : ""}
-                {selected.id === t.active_prompt_id ? " · in use" : ""}
-              </p>
-            )}
-            <TextArea
-              className="mt-3"
-              rows={18}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              aria-label="Prompt text"
-              data-testid="prompt-text"
-              spellCheck={false}
-            />
-            <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
-              <input
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                maxLength={255}
-                placeholder="What changed? (optional, e.g. shorter plan section)"
-                aria-label="Change note"
-                className="h-10 min-w-0 rounded-xl border border-line bg-surface px-3 text-sm text-ink caret-ink outline-none focus:border-brand"
-              />
-              <button type="button" disabled={!changed || saving || !text.trim()} onClick={() => save(false)} className={buttonClass.secondary} data-testid="save-version">
-                <Save className="size-4" /> Save as new version
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="card p-5">
+          <h3 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
+            <ListOrdered className="size-5 text-brand" /> Note headings
+          </h3>
+          <div className="mt-3" />
+          <SectionsEditor value={sections} onChange={changeSections} />
+          {sectionsChanged && (
+            <div className="mt-3 flex gap-2">
+              <button type="button" onClick={() => saveSections()} disabled={sections.filter((s) => s.trim()).length === 0} className={buttonClass.primary} data-testid="save-sections">
+                <Save className="size-4" /> Save headings
               </button>
-              <button type="button" disabled={!changed || saving || !text.trim()} onClick={() => save(true)} className={buttonClass.primary} data-testid="save-and-use">
-                {saving ? <Spinner /> : <CheckCircle2 className="size-4" />} Save & use
+              <button type="button" onClick={() => setSections(t.sections)} className={buttonClass.ghost}>
+                Cancel
               </button>
             </div>
-            {selected && !changed && selected.id !== t.active_prompt_id && (
-              <button type="button" onClick={() => activateVersion(selected.id)} className={`${buttonClass.secondary} mt-2`} data-testid="use-version">
-                <Check className="size-4" /> Use version {selected.version}
-              </button>
-            )}
-          </section>
+          )}
+        </section>
 
-          <section className="card p-5">
+        <section className="card flex flex-col p-5" data-testid="template-prompt-summary">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
-              <ListOrdered className="size-5 text-brand" /> Note headings
+              <Sparkles className="size-5 text-brand" /> Prompt
             </h3>
-            <p className="mb-3 mt-0.5 text-sm text-ink-2">The notes always have exactly these sections, in this order.</p>
-            <SectionsEditor value={sections} onChange={setSections} />
-            {sectionsChanged && (
-              <div className="mt-3 flex gap-2">
-                <button type="button" onClick={saveSections} disabled={sections.filter((s) => s.trim()).length === 0} className={buttonClass.primary} data-testid="save-sections">
-                  <Save className="size-4" /> Save headings
-                </button>
-                <button type="button" onClick={() => setSections(t.sections)} className={buttonClass.ghost}>
-                  Cancel
-                </button>
-              </div>
-            )}
-          </section>
-        </div>
-
-        <div className="xl:sticky xl:top-24 xl:self-start">
-          <TestPanel
-            templateId={t.id}
-            promptId={selectedId}
-            promptText={text}
-            sections={sections}
-            includeCodes={t.include_codes}
-            isDraft={changed}
-          />
-        </div>
+            <Link href={`/prompts/${t.id}`} className={buttonClass.primary} data-testid="open-prompt">
+              <Pencil className="size-4" /> Edit & test prompt
+            </Link>
+          </div>
+          <ul className="mt-3 divide-y divide-line">
+            {t.prompts.map((p) => {
+              const inUse = p.id === t.active_prompt_id;
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => chooseVersion(p.id, p.version)}
+                    disabled={inUse}
+                    title={inUse ? "This version is in use" : `Click to use version ${p.version}`}
+                    data-testid="version-row"
+                    className={clsx(
+                      "flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-start text-sm transition",
+                      inUse ? "cursor-default" : "hover:bg-brand-soft",
+                    )}
+                  >
+                    <span className={clsx("rounded-full px-2.5 py-0.5 text-xs font-semibold", inUse ? versionSolid(p.version) : versionSoft(p.version))}>
+                      v{p.version}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-ink-2">{p.change_note || "No change note"}</span>
+                    <span className="text-xs text-muted">
+                      {p.created_by_name ?? "starter"} · {timeAgo(p.created_at)}
+                    </span>
+                    {inUse ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand">
+                        <Check className="size-3.5" /> in use
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-brand">Use</span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       </div>
 
       {editingDetails && (
@@ -252,9 +207,9 @@ export default function TemplatePage() {
           template={t}
           onClose={() => setEditingDetails(false)}
           onSaved={(d) => {
-            show(d, selectedId);
+            show(d);
             setEditingDetails(false);
-            flash("Details saved.");
+            toast.show("Details saved");
           }}
         />
       )}
@@ -281,6 +236,7 @@ export default function TemplatePage() {
           </div>
         </Modal>
       )}
+      {toast.toast}
     </div>
   );
 }

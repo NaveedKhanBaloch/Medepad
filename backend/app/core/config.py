@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     seed_admin_name: str = "Medepad Admin"
     seed_admin_email: str = "admin@medepad.local"
     seed_admin_password: str = "Admin@12345"
+    # The one super admin (may add admins, switch them off, set their passwords). Empty = SEED_ADMIN_EMAIL.
+    super_admin_email: str = ""
 
     # Notes: "gemini" (free key from Google AI Studio), "openai", "azure_openai" or "mock" (offline samples)
     llm_provider: str = "mock"

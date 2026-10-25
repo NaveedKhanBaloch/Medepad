@@ -87,6 +87,9 @@ export function Select({
   ariaLabel,
   disabled,
   searchPlaceholder,
+  matchWidth,
+  dropUp,
+  size = "md",
 }: {
   value: string | null;
   options: SelectOption[];
@@ -97,6 +100,12 @@ export function Select({
   disabled?: boolean;
   /** shows a search box at the top of the list */
   searchPlaceholder?: string;
+  /** the list opens exactly below the button, with the same width */
+  matchWidth?: boolean;
+  /** the list opens above the button (for dropdowns near the bottom of the screen) */
+  dropUp?: boolean;
+  /** "sm": compact button and list, for dense tables */
+  size?: "md" | "sm";
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -133,7 +142,10 @@ export function Select({
           setQuery("");
           setOpen((o) => !o);
         }}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-start text-sm text-ink hover:border-brand/40 disabled:cursor-default disabled:hover:border-line"
+        className={clsx(
+          "flex w-full items-center justify-between gap-2 border border-line bg-surface-2 text-start text-ink hover:border-brand/40 disabled:cursor-default disabled:hover:border-line",
+          size === "sm" ? "h-8 rounded-lg px-2.5 text-xs font-semibold" : "rounded-xl px-3.5 py-2.5 text-sm",
+        )}
       >
         <span className="flex min-w-0 items-center gap-2 truncate" title={selected?.label}>
           {selected?.icon}
@@ -145,8 +157,11 @@ export function Select({
         <ul
           role="listbox"
           className={clsx(
-            "absolute end-0 z-30 mt-2 min-w-full overflow-auto rounded-xl border border-line bg-surface p-1.5 shadow-xl sm:w-max sm:max-w-md",
-            searchPlaceholder ? "max-h-[26rem] sm:min-w-[24rem]" : "max-h-80",
+            "absolute z-30 overflow-auto rounded-xl border border-line bg-surface p-1.5 shadow-xl",
+            dropUp ? "bottom-full mb-2" : "mt-2",
+            matchWidth ? "inset-x-0 w-full" : "end-0 min-w-full sm:w-max sm:max-w-md",
+            searchPlaceholder ? "max-h-[26rem]" : "max-h-80",
+            searchPlaceholder && !matchWidth && "sm:min-w-[24rem]",
           )}
         >
           {searchPlaceholder && (
@@ -184,7 +199,8 @@ export function Select({
                   setOpen(false);
                 }}
                 className={clsx(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm",
+                  "flex w-full items-center gap-2 rounded-lg text-start",
+                  size === "sm" ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
                   o.locked ? "cursor-not-allowed text-muted" : "text-ink hover:bg-brand-soft",
                 )}
               >

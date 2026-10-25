@@ -108,7 +108,7 @@ export default function LoginPage() {
                 {busy && <Spinner />} Sign in
               </button>
             </form>
-            <p className="mt-4 text-center text-xs text-muted">Forgot your password? Ask another admin to reset it.</p>
+            <p className="mt-4 text-center text-xs text-muted">Forgot your password? Ask the super admin to set a new one.</p>
           </div>
           <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted">
             <ShieldCheck className="size-4 text-brand" /> Admins only · the account locks after 5 wrong passwords

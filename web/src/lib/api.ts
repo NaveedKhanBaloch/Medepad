@@ -61,6 +61,33 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 const json = (body: unknown) => JSON.stringify(body);
 
+/** Downloads a file from the API (needs the sign-in token) and saves it with the name the server gives. */
+async function downloadFile(path: string, fallbackName: string) {
+  const token = tokenStore.get();
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/api/v1${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  } catch {
+    throw new ApiError(0, "Cannot reach the Medepad Admin server. Is the backend running?");
+  }
+  if (!res.ok) {
+    const detail = await res.json().then((d) => d?.detail).catch(() => null);
+    throw new ApiError(res.status, typeof detail === "string" ? detail : "Could not download the file");
+  }
+  const header = res.headers.get("Content-Disposition") || "";
+  const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(header)?.[1];
+  const plain = /filename="([^"]+)"/i.exec(header)?.[1];
+  const name = utf8 ? decodeURIComponent(utf8) : plain || fallbackName;
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 export const api = {
   login: (email: string, password: string, remember: boolean) =>
     request<{ access_token: string; admin: Admin }>("/auth/login", { method: "POST", body: json({ email, password, remember }) }),
@@ -101,6 +128,12 @@ export const api = {
   }) => request<Generation>("/generate", { method: "POST", body: json(data) }),
   generations: (templateId?: number, limit = 20) =>
     request<Generation[]>(`/generations?limit=${limit}${templateId ? `&template_id=${templateId}` : ""}`),
+  /** Saves the notes of one result as a Word document. */
+  downloadGeneration: (id: number) => downloadFile(`/generations/${id}/download`, "notes.docx"),
+  /** Saves all results (of one template, or all) as a ZIP of Word files with notes, transcript and prompt. */
+  downloadResults: (templateId?: number) =>
+    downloadFile(`/generations/export${templateId ? `?template_id=${templateId}` : ""}`, "medepad-results.zip"),
+  deleteGeneration: (id: number) => request<void>(`/generations/${id}`, { method: "DELETE" }),
 
   admins: () => request<Admin[]>("/admins"),
   createAdmin: (data: { name: string; email: string; password: string }) => request<Admin>("/admins", { method: "POST", body: json(data) }),

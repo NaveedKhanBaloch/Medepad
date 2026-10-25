@@ -10,6 +10,7 @@ import { buttonClass } from "@/components/fields";
 import { ErrorBanner, Select, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
 import { timeAgo } from "@/lib/auth";
+import { versionSoft } from "@/lib/version-colors";
 import type { TemplateSummary } from "@/lib/types";
 
 export default function TemplatesPage() {
@@ -35,8 +36,7 @@ export default function TemplatesPage() {
   return (
     <div data-testid="templates-page">
       <PageHeader
-        title="Templates & prompts"
-        subtitle="Each template is what a doctor picks; the prompt behind it tells the AI how to write the notes."
+        title="Templates"
         actions={
           <Link href="/templates/new" className={buttonClass.primary} data-testid="new-template">
             <Plus className="size-4" /> New template
@@ -60,7 +60,8 @@ export default function TemplatesPage() {
           onChange={setGroup}
           options={[{ value: "all", label: "All groups" }, ...groups.map((g) => ({ value: g, label: g }))]}
           ariaLabel="Group"
-          className="w-64"
+          className="w-72"
+          matchWidth
         />
         <span className="text-sm text-muted">{shown.length} templates</span>
       </div>
@@ -97,7 +98,7 @@ export default function TemplatesPage() {
                   </span>
                   <span className="truncate text-sm text-ink-2">{t.group_name || "Other"}</span>
                   <span>
-                    <span className={clsx("rounded-full px-2.5 py-0.5 text-xs font-semibold", t.active_version ? "bg-brand-soft text-brand" : "bg-danger-soft text-danger")}>
+                    <span className={clsx("rounded-full px-2.5 py-0.5 text-xs font-semibold", t.active_version ? versionSoft(t.active_version) : "bg-danger-soft text-danger")}>
                       {t.active_version ? `Version ${t.active_version}` : "None"}
                     </span>
                   </span>

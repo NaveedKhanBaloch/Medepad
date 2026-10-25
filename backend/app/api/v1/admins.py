@@ -1,4 +1,4 @@
-"""Admins manage other admins."""
+"""Managing admins (super admin only; the rule is enforced in AdminService)."""
 from fastapi import APIRouter
 
 from app.api.deps import DB, CurrentAdmin
@@ -9,8 +9,8 @@ router = APIRouter(prefix="/admins", tags=["admins"])
 
 
 @router.get("", response_model=list[AdminOut])
-def list_admins(_: CurrentAdmin, db: DB):
-    return AdminService(db).list()
+def list_admins(admin: CurrentAdmin, db: DB):
+    return AdminService(db).list(admin)
 
 
 @router.post("", response_model=AdminOut, status_code=201)

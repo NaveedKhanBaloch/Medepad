@@ -97,6 +97,17 @@ body {
   box-shadow: 0 1px 2px rgb(28 43 41 / 0.04), 0 8px 24px -12px rgb(28 43 41 / 0.1);
 }
 
+/* Clickable card: teal (brand) outline when the pointer or keyboard focus is on it */
+.card-hover {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.card-hover:hover,
+.card-hover:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 18%, transparent), 0 8px 24px -12px rgb(28 43 41 / 0.15);
+  outline: none;
+}
+
 @keyframes pulse-ring {
   0% { transform: scale(0.95); opacity: 0.6; }
   70% { transform: scale(1.25); opacity: 0; }

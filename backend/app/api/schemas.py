@@ -21,6 +21,7 @@ class AdminOut(ORM):
     id: int
     name: str
     email: str
+    role: str  # super_admin | admin
     is_active: bool
     last_login_at: datetime | None
     created_at: datetime

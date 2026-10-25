@@ -4,6 +4,8 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
+  /** the one super admin manages admins; admins work on templates, prompts, testing and settings */
+  role: "super_admin" | "admin";
   is_active: boolean;
   last_login_at: string | null;
   created_at: string;
