@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Warm Care palette — primary teal #00796B, accent coral #FF7A6B, background #FAFDFC, text #1C2B29 */
+  --bg: #fafdfc;
+  --app-bg: #edf2f1;
+  --surface: #ffffff;
+  --surface-2: #f1f7f6;
+  --border: #dce9e6;
+  --ink: #1c2b29;
+  --ink-2: #44575a;
+  --muted: #7a8e8b;
+  --brand: #00796b;
+  --brand-2: #00897b;
+  --brand-strong: #00594f;
+  --brand-soft: #e0f2ef;
+  --accent: #ff7a6b;
+  --accent-soft: #ffe8e5;
+  --danger: #d64545;
+  --danger-soft: #fdecec;
+  --success: #1f8a5b;
+  --success-soft: #e6f5ee;
+  --warning: #c26a00;
+}
+
+.dark {
+  --bg: #0e1918;
+  --app-bg: #0e1918;
+  --surface: #142322;
+  --surface-2: #1a2d2b;
+  --border: #25403c;
+  --ink: #e6f2f0;
+  --ink-2: #a9c0bc;
+  --muted: #6f8884;
+  --brand: #26a69a;
+  --brand-2: #4db6ac;
+  --brand-strong: #00796b;
+  --brand-soft: #123a35;
+  --accent: #ff8a7d;
+  --accent-soft: #3d221f;
+  --danger: #ff6b6b;
+  --danger-soft: #3a1d20;
+  --success: #3ccf8e;
+  --success-soft: #113226;
+  --warning: #f0a040;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Signed-in app background: soft grey with a faint teal and coral glow. */
+.app-backdrop {
+  background:
+    radial-gradient(1100px 620px at 100% 0%, rgb(255 122 107 / 0.07), transparent 60%),
+    radial-gradient(1000px 700px at 0% 100%, rgb(0 121 107 / 0.08), transparent 60%),
+    var(--app-bg);
+  background-attachment: fixed;
+}
+
+.bg-brand-gradient {
+  background-image: linear-gradient(135deg, var(--brand), var(--brand-2));
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 2px rgb(28 43 41 / 0.04), 0 8px 24px -12px rgb(28 43 41 / 0.1);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  70% { transform: scale(1.25); opacity: 0; }
+  100% { opacity: 0; }
+}
+.pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--danger);
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+/* ---- Logo heartbeat ----------------------------------------------------- */
+@keyframes ecg-trace {
+  0% { stroke-dashoffset: 34; opacity: 1; }
+  62% { stroke-dashoffset: -100; opacity: 1; }
+  63%, 100% { stroke-dashoffset: -100; opacity: 0; }
+}
+.logo-ecg-base { stroke-opacity: 0.55; }
+.logo-ecg {
+  stroke-dasharray: 34 200;
+  animation: ecg-trace 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+@keyframes logo-beat {
+  0%, 44%, 100% { transform: scale(1); }
+  10% { transform: scale(1.07); }
+  20% { transform: scale(0.99); }
+  30% { transform: scale(1.04); }
+}
+.logo-beat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-beat 2.4s ease-in-out infinite;
+}
+
+/* ---- Dashboard welcome heading ------------------------------------------ */
+@keyframes welcome-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.welcome-in { animation: welcome-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes beat-d {
+  0%, 44%, 100% { transform: scale(1); }
+  10% { transform: scale(1.18); }
+  20% { transform: scale(0.97); }
+  30% { transform: scale(1.1); }
+}
+.welcome-beat-d {
+  transform-origin: 50% 85%;
+  animation: beat-d 2.4s ease-in-out infinite;
+}
+
+/* ---- Audio player progress bar: light track that fills with coral ------- */
+.audio-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--border) var(--pct, 0%));
+  outline: none;
+}
+.audio-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.audio-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+}
+.audio-range:focus-visible { box-shadow: 0 0 0 4px rgb(255 122 107 / 0.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring::before { animation: none; }
+  .welcome-in, .welcome-beat-d { animation: none; }
+  .logo-ecg { animation: none; opacity: 0; }
+  .logo-ecg-base { stroke-opacity: 1; }
+  .logo-beat { animation: none; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+  .card { box-shadow: none; border: none; }
+}
+
+/* Clicking on normal text (or the avatar) never shows a blinking text cursor; form fields keep theirs. */
+body {
+  caret-color: transparent;
+}
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  caret-color: auto;
+}

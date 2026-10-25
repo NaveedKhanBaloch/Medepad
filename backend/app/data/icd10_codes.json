@@ -1,0 +1,541 @@
+[
+ {
+  "code": "M54.5",
+  "description": "Low back pain",
+  "keywords": [
+   "back pain",
+   "lower back",
+   "lumbar"
+  ]
+ },
+ {
+  "code": "M54.4",
+  "description": "Lumbago with sciatica",
+  "keywords": [
+   "sciatica",
+   "leg pain"
+  ]
+ },
+ {
+  "code": "M54.2",
+  "description": "Cervicalgia",
+  "keywords": [
+   "neck pain"
+  ]
+ },
+ {
+  "code": "M25.5",
+  "description": "Pain in joint",
+  "keywords": [
+   "joint pain"
+  ]
+ },
+ {
+  "code": "M79.1",
+  "description": "Myalgia",
+  "keywords": [
+   "muscle pain",
+   "myalgia"
+  ]
+ },
+ {
+  "code": "M17.9",
+  "description": "Gonarthrosis, unspecified",
+  "keywords": [
+   "knee arthritis",
+   "knee osteoarthritis"
+  ]
+ },
+ {
+  "code": "M75.1",
+  "description": "Rotator cuff syndrome",
+  "keywords": [
+   "rotator cuff",
+   "shoulder pain"
+  ]
+ },
+ {
+  "code": "S93.4",
+  "description": "Sprain and strain of ankle",
+  "keywords": [
+   "ankle sprain",
+   "twisted ankle"
+  ]
+ },
+ {
+  "code": "S63.5",
+  "description": "Sprain and strain of wrist",
+  "keywords": [
+   "wrist sprain"
+  ]
+ },
+ {
+  "code": "J06.9",
+  "description": "Acute upper respiratory infection, unspecified",
+  "keywords": [
+   "cold",
+   "upper respiratory",
+   "runny nose"
+  ]
+ },
+ {
+  "code": "J02.9",
+  "description": "Acute pharyngitis, unspecified",
+  "keywords": [
+   "sore throat",
+   "pharyngitis"
+  ]
+ },
+ {
+  "code": "J03.9",
+  "description": "Acute tonsillitis, unspecified",
+  "keywords": [
+   "tonsillitis"
+  ]
+ },
+ {
+  "code": "J20.9",
+  "description": "Acute bronchitis, unspecified",
+  "keywords": [
+   "bronchitis"
+  ]
+ },
+ {
+  "code": "J21.9",
+  "description": "Acute bronchiolitis, unspecified",
+  "keywords": [
+   "bronchiolitis"
+  ]
+ },
+ {
+  "code": "J18.9",
+  "description": "Pneumonia, unspecified",
+  "keywords": [
+   "pneumonia"
+  ]
+ },
+ {
+  "code": "J30.4",
+  "description": "Allergic rhinitis, unspecified",
+  "keywords": [
+   "hay fever",
+   "allergic rhinitis"
+  ]
+ },
+ {
+  "code": "J45.9",
+  "description": "Asthma, unspecified",
+  "keywords": [
+   "asthma",
+   "wheez"
+  ]
+ },
+ {
+  "code": "J44.9",
+  "description": "Chronic obstructive pulmonary disease, unspecified",
+  "keywords": [
+   "copd"
+  ]
+ },
+ {
+  "code": "U07.1",
+  "description": "COVID-19, virus identified",
+  "keywords": [
+   "covid"
+  ]
+ },
+ {
+  "code": "R05",
+  "description": "Cough",
+  "keywords": [
+   "cough"
+  ]
+ },
+ {
+  "code": "R50.9",
+  "description": "Fever, unspecified",
+  "keywords": [
+   "fever",
+   "temperature"
+  ]
+ },
+ {
+  "code": "R51",
+  "description": "Headache",
+  "keywords": [
+   "headache"
+  ]
+ },
+ {
+  "code": "R42",
+  "description": "Dizziness and giddiness",
+  "keywords": [
+   "dizz"
+  ]
+ },
+ {
+  "code": "R53",
+  "description": "Malaise and fatigue",
+  "keywords": [
+   "fatigue",
+   "tired"
+  ]
+ },
+ {
+  "code": "R10.4",
+  "description": "Other and unspecified abdominal pain",
+  "keywords": [
+   "abdominal pain",
+   "stomach pain",
+   "tummy"
+  ]
+ },
+ {
+  "code": "I10",
+  "description": "Essential (primary) hypertension",
+  "keywords": [
+   "hypertension",
+   "high blood pressure"
+  ]
+ },
+ {
+  "code": "I20.9",
+  "description": "Angina pectoris, unspecified",
+  "keywords": [
+   "angina",
+   "chest pain"
+  ]
+ },
+ {
+  "code": "I48.9",
+  "description": "Atrial fibrillation and atrial flutter, unspecified",
+  "keywords": [
+   "atrial fibrillation",
+   "afib"
+  ]
+ },
+ {
+  "code": "I50.9",
+  "description": "Heart failure, unspecified",
+  "keywords": [
+   "heart failure"
+  ]
+ },
+ {
+  "code": "E11.9",
+  "description": "Type 2 diabetes mellitus without complications",
+  "keywords": [
+   "type 2 diabetes",
+   "diabetes"
+  ]
+ },
+ {
+  "code": "E10.9",
+  "description": "Type 1 diabetes mellitus without complications",
+  "keywords": [
+   "type 1 diabetes"
+  ]
+ },
+ {
+  "code": "E03.9",
+  "description": "Hypothyroidism, unspecified",
+  "keywords": [
+   "hypothyroid",
+   "underactive thyroid"
+  ]
+ },
+ {
+  "code": "E78.5",
+  "description": "Hyperlipidaemia, unspecified",
+  "keywords": [
+   "cholesterol",
+   "hyperlipid"
+  ]
+ },
+ {
+  "code": "E66.9",
+  "description": "Obesity, unspecified",
+  "keywords": [
+   "obesity",
+   "overweight"
+  ]
+ },
+ {
+  "code": "D50.9",
+  "description": "Iron deficiency anaemia, unspecified",
+  "keywords": [
+   "anaemia",
+   "anemia",
+   "iron deficiency"
+  ]
+ },
+ {
+  "code": "F32.9",
+  "description": "Depressive episode, unspecified",
+  "keywords": [
+   "depress",
+   "low mood"
+  ]
+ },
+ {
+  "code": "F33.9",
+  "description": "Recurrent depressive disorder, unspecified",
+  "keywords": [
+   "recurrent depression"
+  ]
+ },
+ {
+  "code": "F41.1",
+  "description": "Generalized anxiety disorder",
+  "keywords": [
+   "generalized anxiety",
+   "generalised anxiety"
+  ]
+ },
+ {
+  "code": "F41.9",
+  "description": "Anxiety disorder, unspecified",
+  "keywords": [
+   "anxiety",
+   "anxious",
+   "panic"
+  ]
+ },
+ {
+  "code": "F43.1",
+  "description": "Post-traumatic stress disorder",
+  "keywords": [
+   "ptsd",
+   "trauma"
+  ]
+ },
+ {
+  "code": "F43.2",
+  "description": "Adjustment disorders",
+  "keywords": [
+   "adjustment disorder"
+  ]
+ },
+ {
+  "code": "F51.0",
+  "description": "Nonorganic insomnia",
+  "keywords": [
+   "insomnia",
+   "can't sleep",
+   "trouble sleeping"
+  ]
+ },
+ {
+  "code": "F90.0",
+  "description": "Disturbance of activity and attention",
+  "keywords": [
+   "adhd",
+   "attention deficit"
+  ]
+ },
+ {
+  "code": "F10.2",
+  "description": "Mental and behavioural disorders due to use of alcohol: dependence syndrome",
+  "keywords": [
+   "alcohol dependence",
+   "drinking problem"
+  ]
+ },
+ {
+  "code": "F20.9",
+  "description": "Schizophrenia, unspecified",
+  "keywords": [
+   "schizophrenia"
+  ]
+ },
+ {
+  "code": "F31.9",
+  "description": "Bipolar affective disorder, unspecified",
+  "keywords": [
+   "bipolar"
+  ]
+ },
+ {
+  "code": "Z73.0",
+  "description": "Burn-out",
+  "keywords": [
+   "burnout",
+   "burn-out",
+   "burned out"
+  ]
+ },
+ {
+  "code": "Z56.6",
+  "description": "Other physical and mental strain related to work",
+  "keywords": [
+   "work stress",
+   "workplace stress"
+  ]
+ },
+ {
+  "code": "G43.9",
+  "description": "Migraine, unspecified",
+  "keywords": [
+   "migraine"
+  ]
+ },
+ {
+  "code": "G44.2",
+  "description": "Tension-type headache",
+  "keywords": [
+   "tension headache"
+  ]
+ },
+ {
+  "code": "K21.9",
+  "description": "Gastro-oesophageal reflux disease without oesophagitis",
+  "keywords": [
+   "reflux",
+   "heartburn",
+   "gerd"
+  ]
+ },
+ {
+  "code": "K29.7",
+  "description": "Gastritis, unspecified",
+  "keywords": [
+   "gastritis"
+  ]
+ },
+ {
+  "code": "K58.9",
+  "description": "Irritable bowel syndrome without diarrhoea",
+  "keywords": [
+   "ibs",
+   "irritable bowel"
+  ]
+ },
+ {
+  "code": "K59.0",
+  "description": "Constipation",
+  "keywords": [
+   "constipat"
+  ]
+ },
+ {
+  "code": "A09.9",
+  "description": "Gastroenteritis and colitis of unspecified origin",
+  "keywords": [
+   "gastroenteritis",
+   "diarrhoea",
+   "diarrhea",
+   "vomiting"
+  ]
+ },
+ {
+  "code": "N39.0",
+  "description": "Urinary tract infection, site not specified",
+  "keywords": [
+   "urinary tract infection",
+   "uti",
+   "burning when urinating"
+  ]
+ },
+ {
+  "code": "N94.6",
+  "description": "Dysmenorrhoea, unspecified",
+  "keywords": [
+   "period pain",
+   "dysmenorrh"
+  ]
+ },
+ {
+  "code": "N92.0",
+  "description": "Excessive and frequent menstruation with regular cycle",
+  "keywords": [
+   "heavy periods",
+   "heavy bleeding"
+  ]
+ },
+ {
+  "code": "N95.1",
+  "description": "Menopausal and female climacteric states",
+  "keywords": [
+   "menopaus",
+   "hot flush"
+  ]
+ },
+ {
+  "code": "Z34.9",
+  "description": "Supervision of normal pregnancy, unspecified",
+  "keywords": [
+   "pregnan"
+  ]
+ },
+ {
+  "code": "L20.9",
+  "description": "Atopic dermatitis, unspecified",
+  "keywords": [
+   "eczema",
+   "atopic dermatitis"
+  ]
+ },
+ {
+  "code": "L30.9",
+  "description": "Dermatitis, unspecified",
+  "keywords": [
+   "rash",
+   "dermatitis"
+  ]
+ },
+ {
+  "code": "L40.9",
+  "description": "Psoriasis, unspecified",
+  "keywords": [
+   "psoriasis"
+  ]
+ },
+ {
+  "code": "L70.0",
+  "description": "Acne vulgaris",
+  "keywords": [
+   "acne"
+  ]
+ },
+ {
+  "code": "H10.9",
+  "description": "Conjunctivitis, unspecified",
+  "keywords": [
+   "conjunctivitis",
+   "pink eye"
+  ]
+ },
+ {
+  "code": "H66.9",
+  "description": "Otitis media, unspecified",
+  "keywords": [
+   "ear infection",
+   "otitis"
+  ]
+ },
+ {
+  "code": "B01.9",
+  "description": "Varicella without complication",
+  "keywords": [
+   "chickenpox",
+   "varicella"
+  ]
+ },
+ {
+  "code": "Z00.0",
+  "description": "General medical examination",
+  "keywords": [
+   "check-up",
+   "checkup",
+   "routine examination"
+  ]
+ },
+ {
+  "code": "Z76.0",
+  "description": "Issue of repeat prescription",
+  "keywords": [
+   "repeat prescription",
+   "refill"
+  ]
+ }
+]
